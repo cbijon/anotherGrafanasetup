@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  influxdb:
+    image: influxdb:latest
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb
+      - ./influxdb.conf:/etc/influxdb/influxdb.conf:ro
+      - ./data/influxdbv2:/var/lib/influxdb2:rw
+    ports:
+      - "8086:8086"
+
+  influxdb-cli:
+    image: influxdb:latest
+    volumes:
+      - ./influxdb.conf:/etc/influxdb/influxdb.conf:ro
+    entrypoint:
+      - influx
+      - -host
+      - influxdb
+    links:
+      - influxdb
+     
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    env_file:
+      - 'env.grafana'
+    user: "0"
+    links:
+      - influxdb
+      - loki
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./data/etc/grafana:/etc/grafana
+      - ./data/log/grafana:/var/log/grafana
+
+  loki:
+    image: grafana/loki:2.9.3
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    # before launch do : sudo mkdir /etc/loki && sudo ln -s loki-config.yaml /etc/loki/local-config.yaml
+
+volumes:
+  grafana_data:
+

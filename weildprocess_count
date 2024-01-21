@@ -1,0 +1,5 @@
+#!/bin/sh
+
+count=$(ps aux | grep [w]ield| grep -c -v grep)
+
+echo $count

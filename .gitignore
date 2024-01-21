@@ -1,0 +1,3 @@
+data/grafana/*
+data/influxdbv2/*
+data/log/*
